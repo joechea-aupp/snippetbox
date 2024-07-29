@@ -23,9 +23,11 @@ func main() {
 	godotenv.Load(".env")
 	dbuser := os.Getenv("DBUser")
 	dbpass := os.Getenv("DBPass")
+	dbaddress := os.Getenv("DBAddress")
+	dbport := os.Getenv("DBPort")
 
 	addr := flag.String("addr", ":4000", "HTTP network address")
-	dsn := flag.String("dsn", fmt.Sprintf("%s:%s@/snippetbox?parseTime=true", dbuser, dbpass), "MySQL data source name")
+	dsn := flag.String("dsn", fmt.Sprintf("%s:%s@tcp(%s:%v)/snippetbox?parseTime=true", dbuser, dbpass, dbaddress, dbport), "MySQL data source name")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
