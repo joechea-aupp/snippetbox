@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/go-playground/form"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joechea-aupp/snippetbox/internal/models"
 	"github.com/joho/godotenv"
@@ -19,6 +20,7 @@ type application struct {
 	infoLog       *log.Logger
 	snippets      *models.SnippetModel
 	templateCache map[string]*template.Template
+	formDecoder   *form.Decoder
 }
 
 func main() {
@@ -47,11 +49,14 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	formDecoder := form.NewDecoder()
+
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
 		snippets:      &models.SnippetModel{DB: db},
 		templateCache: templateCache,
+		formDecoder:   formDecoder,
 	}
 
 	srv := &http.Server{
@@ -59,11 +64,9 @@ func main() {
 		ErrorLog: errorLog,
 		Handler:  app.routes(),
 	}
-	// log.Printf("Starting server on %s", *addr)
+
 	infoLog.Printf("Starting server on %s", *addr)
-	// err := http.ListenAndServe(*addr, mux)
 	err = srv.ListenAndServe()
-	// log.Fatal(err)
 	errorLog.Fatal(err)
 }
 
