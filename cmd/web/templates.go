@@ -13,6 +13,7 @@ type templateData struct {
 	Snippets    []*models.Snippet
 	CurrentYear int
 	Form        any
+	Flash       string
 }
 
 // this function basically load template for each page into a memeory
