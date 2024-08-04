@@ -15,6 +15,7 @@ type templateData struct {
 	Form            any
 	Flash           string
 	IsAuthenticated bool
+	CSRFToken       string
 }
 
 // this function basically load template for each page into a memeory
