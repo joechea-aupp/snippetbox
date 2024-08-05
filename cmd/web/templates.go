@@ -2,10 +2,12 @@ package main
 
 import (
 	"html/template"
+	"io/fs"
 	"path/filepath"
 	"time"
 
 	"github.com/joechea-aupp/snippetbox/internal/models"
+	"github.com/joechea-aupp/snippetbox/ui"
 )
 
 type templateData struct {
@@ -25,7 +27,7 @@ func newTemplateCache() (map[string]*template.Template, error) {
 
 	// use filepath.Glob() to get slice of all filepath within the match pattern *
 	// like: [ui/html/pages/home.tmpl.html ui/html/pages/show.tmpl.html ui/html/pages/create.tmpl.html]
-	pages, err := filepath.Glob("./ui/html/pages/*.tmpl.html")
+	pages, err := fs.Glob(ui.Files, "html/page/*.tmpl.html")
 	if err != nil {
 		return nil, err
 	}
@@ -35,17 +37,13 @@ func newTemplateCache() (map[string]*template.Template, error) {
 		// and assigned it to a variable name
 		name := filepath.Base(page)
 
-		ts, err := template.New(name).Funcs(functions).ParseFiles("./ui/html/base.tmpl.html")
-		if err != nil {
-			return nil, err
+		patterns := []string{
+			"html/base.tmpl.html",
+			"html/partials/*.tmpl.html",
+			page,
 		}
 
-		ts, err = ts.ParseGlob("./ui/html/partials/*.tmpl.html")
-		if err != nil {
-			return nil, err
-		}
-
-		ts, err = ts.ParseFiles(page)
+		ts, err := template.New(name).Funcs(functions).ParseFS(ui.Files, patterns...)
 		if err != nil {
 			return nil, err
 		}
